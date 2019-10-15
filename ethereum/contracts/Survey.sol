@@ -40,7 +40,7 @@ contract SurveyFactory {
 
         Survey survey = Survey(_survey);
         survey.transfer(msg.value);
-        survey.ratingSurvey(_ratingSurvey); 
+        survey.ratingSurvey(_ratingSurvey, users[msg.sender]); 
     }
 
     function ratingCommentAt(address _survey, uint _ratingComment, uint _index) public payable {
@@ -105,6 +105,7 @@ contract Survey {
     uint public numRate;
     uint public sumRate;
     int public count = 0;
+    address[] public alreadyRateSurvey;
 
     function() payable { }
     
@@ -159,10 +160,11 @@ contract Survey {
         return start;
     }
 
-    function ratingSurvey(uint _ratingSurvey) public {
+    function ratingSurvey(uint _ratingSurvey, address _user) public {
         numRate++;
         sumRate = sumRate + _ratingSurvey;
         surveyRate = sumRate/numRate;
+        alreadyRateSurvey.push(_user);
     }
 
     function getRatingSurvey() public returns (uint){
@@ -213,6 +215,10 @@ contract Survey {
         return commentList[index].commentRate;
     }
 
+    function getAlreadyRateList() public returns (address[]){
+        return alreadyRateSurvey;
+    }
+
 }
 
 contract Profile {
@@ -231,4 +237,5 @@ contract Profile {
     function getToken() public returns(uint){
         return token;
     }
+
 }
