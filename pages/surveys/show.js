@@ -40,19 +40,12 @@ class SurveyShow extends Component {
         errorMessageRatingSurvey: '',
         successMessageRatingSurvey: '',
         loadingRatingSurvey: false,
-        disabledRatingSurvey: false,
-        popUpRatingComment: false,
-        loadingRatingComment: false,
-        errorMessageRatingComment: '',
-        disabledRatingComment: false,
         rating: 0, //current rating
         submitRate: false, //for question,
-        submitRateComment: false,
         totalRating: 0,
-        totalRatingComment: 0,
         ratingComment: 0,
         currentIndexComment: -1,
-        cannotRate: false,
+        cannotRateSurvey: false,
         toggleChildRep: [],
         disabledMainComment: false
     };
@@ -137,50 +130,30 @@ class SurveyShow extends Component {
         event.preventDefault();
         this.setState({ loadingRatingSurvey: true, errorMessageRatingSurvey: '' });
         const accounts = await web3.eth.getAccounts();
-        await factory.methods.ratingSurveyAt(this.props.address, this.state.rating).send({
-            from: accounts[0],
-        });
-        const myRating = await Survey(this.props.address).methods.getRatingSurvey().call();
-       
-        this.setState({ 
+        const myAddress = await factory.methods.getProfile(accounts[0]).call();
+        const survey = Survey(this.props.address);
+        const surveyOwner = await survey.methods.getOwner().call();
+        const myRatedPeople = await survey.methods.getAlreadyRateList().call();
+        console.log(myAddress);
+        if(accounts[0]!= surveyOwner && (myRatedPeople==null||!myRatedPeople.includes(myAddress))){
+            await factory.methods.ratingSurveyAt(this.props.address, this.state.rating).send({
+                from: accounts[0],
+            });
+            const myRating = await Survey(this.props.address).methods.getRatingSurvey().call();
+            this.setState({ 
                     totalRating: myRating,
                     submitRate: true ,
-                    disabledRatingSurvey: true
-                });
+                    loadingRatingSurvey: false ,
+                    popUpRatingSurvey: false}); 
+        }
+        else {
+            this.setState({  
+                loadingRatingSurvey: false,
+                popUpRatingSurvey: false,
+                cannotRateSurvey: true });
+        }    
 
-        this.setState({ loadingRatingSurvey: false ,
-                        popUpRatingSurvey: false}); 
     }
-
-    // onSubmitRatingComment = async (event, index)=>{
-    //     event.preventDefault();
-    //     this.setState({ loadingRatingComment: true, errorMessageRatingComment: '' });
-    //     const accounts = await web3.eth.getAccounts();
-    //     const survey = Survey(this.props.address);
-    //     const commentList = await survey.methods.getCommentList().call();
-        
-    //     if (accounts[0] != commentList[index].commentor){
-    //         console.log("Not same")
-    //         await factory.methods.ratingCommentAt(this.props.address, this.state.ratingComment, index).send({
-    //             from: accounts[0],
-    //         });
-    //         const myRating = await survey.methods.getCommentRate(index).call();
-    //         this.setState({ 
-    //                     totalRatingComment: myRating,
-    //                     loadingRatingComment: false,
-    //                     submitRateComment: true, 
-    //                     popUpRatingComment: false ,
-    //                     disabledRatingComment: true    
-    //                 });
-    //     }
-    //     else {
-    //         console.log("Same");
-    //         this.setState({ cannotRate: true, 
-    //                         loadingRatingComment: false,
-    //                         popUpRatingComment: false,
-    //                         disabledRatingComment: true });
-    //     }
-    // }
 
 
     showSurvey() {
@@ -282,15 +255,6 @@ class SurveyShow extends Component {
                                     <Comment.Text>
                                         {commentText_arr[index]}
                                     </Comment.Text>
-                                    {/* <Comment.Actions>
-                                        <Comment.Action><span onClick={() => this.setState({ 
-                                                                                            popUpRatingComment: true,
-                                                                                            currentIndexComment: index
-                                                                                            })}>Vote</span></Comment.Action>
-                                        <Comment.Action><Rating icon='star' 
-                                                            rating={((this.state.submitRateComment&&(this.state.currentIndexComment==index))? this.state.totalRatingComment: this.props.ratingCommentList[index])/1}
-                                                            maxRating={5} disabled /></Comment.Action> 
-                                    </Comment.Actions> */}
                                 </Comment.Content>
                             </Comment>
                         <br /> 
@@ -376,13 +340,6 @@ class SurveyShow extends Component {
                                                 {toggleChildRep[index] == false ? "Reply" : "Close"}
                                             </span>
                                         </Comment.Action>                                               
-                                        {/* <Comment.Action><span onClick={() => this.setState({ 
-                                                                                            popUpRatingComment: true,
-                                                                                            currentIndexComment: index
-                                                                                            })}>Vote</span></Comment.Action>
-                                        <Comment.Action><Rating icon='star' 
-                                                            rating={((this.state.submitRateComment&&(this.state.currentIndexComment==index))? this.state.totalRatingComment: this.props.ratingCommentList[index])/1}
-                                                            maxRating={5} disabled /></Comment.Action>   */}
                                     </Comment.Actions>
 
                                     <br /> 
@@ -429,29 +386,7 @@ class SurveyShow extends Component {
                         onClick={(e) => this.onSubmitComment(e, -1)} />        {/* parent = -1 */}  
             </center>
         </Form>
-        {/* <Modal
-            size="tiny"
-            open={this.state.popUpRatingComment}
-            onClose={() => this.setState({ popUpRatingComment: false })}
-            style={{textAlign: 'center'}}
-        >
-            <Modal.Header>Rate this comment</Modal.Header>
-            <Modal.Content>
-                <span textAlign='center'><Rating onRate={(e, {rating} ) => this.setState({ratingComment: rating})} maxRating={5} icon='star' size='massive' /></span>
-            </Modal.Content>
-            <Modal.Actions>
-                <Button negative onClick={() => this.setState({ popUpRatingComment: false })}>
-                    <Icon name='remove' />
-                    Cancel
-                </Button>
-                <Button positive onClick={(e) => this.onSubmitRatingComment(e,this.state.currentIndexComment)} loading={this.state.loadingRatingComment} 
-                // 
-                >
-                    <Icon name='checkmark' />
-                    Submit
-                </Button>
-            </Modal.Actions>
-            </Modal> */}
+
         
 
         <Modal
@@ -477,15 +412,15 @@ class SurveyShow extends Component {
                 </Button>
             </Modal.Actions>
                 </Modal>
-
-        {/* <Modal
+        
+        <Modal
             size="tiny"
-            open={this.state.cannotRate}
-            onClose={() => this.setState({ cannotRate: false })}
+            open={this.state.cannotRateSurvey}
+            onClose={() => this.setState({ cannotRateSurvey: false })}
             style={{textAlign: 'center'}}
         >
-            <Modal.Header>You cannot rate your own comment</Modal.Header>
-                </Modal> */}
+            <Modal.Header>You cannot rate your own survey or rate some surveys again</Modal.Header>
+        </Modal>
         </Container>
       );
     }
