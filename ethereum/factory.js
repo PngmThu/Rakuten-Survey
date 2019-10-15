@@ -4,7 +4,7 @@ import SurveyFactory from './build/SurveyFactory.json';
 
 const instance = new web3.eth.Contract(
     JSON.parse(SurveyFactory.interface),
-    '0x4491B9e9dC8a1fad4ff5fB1eCD5DfeC9Eff21411'
+    '0xf37724B5a8F104412E63b5531f0e41fEaBc70d77'
     //Thu ropsten: '0x44a365379dd1ac1e05d5203e54c1e8cd7f9d9383'
 );
 
