@@ -309,7 +309,7 @@ class SurveyIndex extends Component {
                         />
                 </Table.Cell>
                 <Table.Cell textAlign='center'>
-                    <p>{suggestion}</p>
+                    <p style={{overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', width: '500px' }}>{suggestion}</p>
                 </Table.Cell> 
                 <Table.Cell textAlign='center'>
                     <Message compact size='mini'
@@ -398,19 +398,6 @@ class SurveyIndex extends Component {
         return(
             <Layout searchItem = {this.props.searchItem} >
                 {this.showGalaxy()}
-            
-                {/* <Divider horizontal 
-                style={{marginTop: '70px'}} 
-                >
-                    <Header as='h2'>
-                        <Icon name='tag' color='red'/>
-                        STATISTICS
-                    </Header>
-                </Divider> */}
-
-                {/* <h2>Suggestions</h2>
-                <Divider hidden/> */}
-
                 {this.renderRentsDesktop()}
 
                 <Divider hidden/>
