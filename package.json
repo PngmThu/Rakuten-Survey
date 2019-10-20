@@ -41,6 +41,7 @@
     "react-easy-crop": "^1.12.0",
     "react-to-print": "^2.2.1",
     "react-qr-reader": "^2.2.1",
+    "react-google-charts": "^3.0.15",
     "semantic-ui-css": "^2.4.1",
     "semantic-ui-react": "^0.87.1",
     "solc": "^0.4.25",
